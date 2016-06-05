@@ -15,7 +15,7 @@ error_reporting(E_ALL & ~E_NOTICE); //所有錯誤中排除NOTICE提示
 date_default_timezone_set("Asia/Taipei");//時區設定
 $time = (string)time();
 $ymdhis=date('y/m/d H:i:s',$time);//輸出的檔案名稱
-//if($query_string){$url=$query_string;}else{$url=$input_a;}
+if($query_string){$url=$query_string;}else{$url=$input_a;}
 $url=$input_a;
 $url=trim($url);
 //載入外部檔案
@@ -262,7 +262,7 @@ if($kdao_only){//只使用於綜合網址
 	//
 	$chat_array[0]['zzz_text'] = $html->outertext;//剩餘的內容//非檢查點//下方有用到
 	//
-	//preg_match("/\[[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+ /U",$chat_array[0]['zzz_text'],$chat_array[0]['time']);
+	//preg_match("/[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+ /U",$chat_array[0]['zzz_text'],$chat_array[0]['time']);
 	preg_match("/[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+/",$chat_array[0]['zzz_text'],$chat_array[0]['time']);
 	$chat_array[0]['time'] = implode("",$chat_array[0]['time']);
 	//
@@ -318,7 +318,7 @@ if($kdao_only){//只使用於綜合網址
 		//
 		$cc1++;//計算推文數量
 	}//迴圈//
-	$htmlbody=' '.$url."<br/>\n".$board_title2."<br/>\n"."[$cc1][$cc2]<br>\n".$htmlbody."<br>\n<br>\n";
+	$htmlbody='<a href="./">根</a> '.$url."<br/>\n".$board_title2."<br/>\n"."[$cc1][$cc2]<br>\n".$htmlbody."<br>\n<br>\n";
 	$output_path=output_html($htmlbody);//回傳檔案位置
 	//$curlpost=curlpost_html($output_path);
 }
@@ -378,7 +378,7 @@ function output_html($x){
 	//
 	$htmlbody=$x;
 	//
-$htmlbody=<<<EOT
+$htmlbody2=<<<EOT
 <html>
 <head>
 <title>$board_title2</title>
@@ -432,6 +432,7 @@ $htmlbody
 </html>;
 EOT;
 	//$htmlbody=htmlhead().$htmlbody.htmlendd();
+if(0){
 	$path='./_'.$ym.'/';
 	if( !is_dir($path) ){
 		mkdir($path, 0777); //建立資料夾 權限0777
@@ -446,7 +447,20 @@ EOT;
 	if(!is_file($tmp)){die("複製檔案失敗");}
 	//
 	//$tmp=$path.'dbp_'.$time.'_'.$url_num2.'n'.$url_num.'_'.rdm_str().'.htm';
-	$tmp=$path.'dbp_'.$time.'_'.$url_num2.'n'.$url_num.'.htm';
+}
+$tmp=pathinfo($_SERVER["SCRIPT_FILENAME"]);
+//print_r($url_i);
+/*
+Array
+(
+    [dirname] => /00/src
+    [basename] => 1406616621815.jpg
+    [extension] => jpg
+    [filename] => 1406616621815
+)
+*/
+	//$tmp=$path.'dbp_'.$time.'_'.$url_num2.'n'.$url_num.'.htm';
+	$tmp=$tmp['filename'].'.txt';
 	if(is_file($tmp)){
 		unlink($tmp);
 		if(is_file($tmp)){die("刪除檔案失敗");}
@@ -476,8 +490,6 @@ function phppoi(){
 	}
 	$output.='<a href="'.$output_path.'">'.$output_path.'</a>'."\n";
 	$output.='<a href="./'.$phpself.'">返</a>'."\n";
-	$output.='<a href="./">根</a>'."\n";
-	
 	//$output.='<pre>'.$curlpost.'</pre>'."\n";
 
 	//$output.='<a href="https://archive.today/?run=1&url='.$phplink.'" target="_blank">archive.today</a>'."\n";

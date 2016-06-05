@@ -4,7 +4,7 @@
 header('Content-type: text/html; charset=utf-8');
 //echo set_time_limit();
 //ini_set('max_execution_time',0);
-$query_string=$_SERVER['QUERY_STRING'];
+
 $phphost=$_SERVER["SERVER_NAME"];
 $phplink="http://".$_SERVER["SERVER_NAME"].$_SERVER["SCRIPT_NAME"]."?".$query_string;
 $phpself=basename($_SERVER["SCRIPT_FILENAME"]);//被執行的文件檔名
@@ -15,8 +15,13 @@ error_reporting(E_ALL & ~E_NOTICE); //所有錯誤中排除NOTICE提示
 date_default_timezone_set("Asia/Taipei");//時區設定
 $time = (string)time();
 $ymdhis=date('y/m/d H:i:s',$time);//輸出的檔案名稱
-//if($query_string){$url=$query_string;}else{$url=$input_a;}
-$url=$input_a;
+
+$query_string=$_SERVER['QUERY_STRING'];
+if($query_string){$url=$query_string;}else{$url=$input_a;}
+
+//echo $url;exit;
+
+//$url=$input_a;
 $url=trim($url);
 //載入外部檔案
 $tmp="../curl_getinfo.php";
@@ -294,19 +299,21 @@ if($kdao_only){//只使用於綜合網址
 		if( $v['image'] ){//回應中有圖 // 網址字串
 			//$htmlbody.= '[<span class="image"><a href="'.$v['image'].'" target="_blank"><img class="zoom" src="'.$v['image'].'"/></a></span>]'."<br/>\n";
 			//$tmp='http://zh150609.xp3.biz/mysql_blob.php?cdn!'.$v['image'];
-			$tmp0="http://web.archive.org/web/2016/".$v['image'];
+			//$tmp0="http://web.archive.org/web/2016/".$v['image'];
+			$tmp0="".$v['image'];
 			//$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp.'"/></span>]';
+			$tmp="".$tmp0;
 			//$tmp="http://demo.cloudimg.io/cdn/n/n/".$v['image'];
 
-			$tmp="http://demo.cloudimg.io/cdn/n/n/".$tmp0;
+			//$tmp="http://demo.cloudimg.io/cdn/n/n/".$tmp0;
 			//$htmlbody.= '[<span class="image2"><a href="'.$tmp.'"/>備份?</a></span>]';
 			$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp.'"/></span>]';
 			//$tmp='http://crossorigin.me/http://zh150614.athost.biz/img_hot_url.php?door='.$tmp;
 			//$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp.'"/></span>]';
 
 
-			$tmp="".$tmp0;
-			$htmlbody.= '[<span class="image2"><a href="'.$tmp.'"/>備份?</a></span>]';
+
+			//$htmlbody.= '[<span class="image2"><a href="'.$tmp.'"/>備份?</a></span>]';
 
 			
 			//$tmp="http://assembly.firesize.com/n/g_none/".$tmp0;
@@ -432,6 +439,7 @@ $htmlbody
 </html>;
 EOT;
 	//$htmlbody=htmlhead().$htmlbody.htmlendd();
+if(0){
 	$path='./_'.$ym.'/';
 	if( !is_dir($path) ){
 		mkdir($path, 0777); //建立資料夾 權限0777
@@ -446,7 +454,20 @@ EOT;
 	if(!is_file($tmp)){die("複製檔案失敗");}
 	//
 	//$tmp=$path.'dbp_'.$time.'_'.$url_num2.'n'.$url_num.'_'.rdm_str().'.htm';
-	$tmp=$path.'dbp_'.$time.'_'.$url_num2.'n'.$url_num.'.htm';
+}
+$tmp=pathinfo($_SERVER["SCRIPT_FILENAME"]);
+//print_r($url_i);
+/*
+Array
+(
+    [dirname] => /00/src
+    [basename] => 1406616621815.jpg
+    [extension] => jpg
+    [filename] => 1406616621815
+)
+*/
+	//$tmp=$path.'dbp_'.$time.'_'.$url_num2.'n'.$url_num.'.htm';
+	$tmp=$tmp['filename'].'.htm';
 	if(is_file($tmp)){
 		unlink($tmp);
 		if(is_file($tmp)){die("刪除檔案失敗");}
@@ -465,6 +486,7 @@ function phppoi(){
 	$phplink=$GLOBALS['phplink'];
 	$htmlbody=$GLOBALS['htmlbody'];
 	$output_path=$GLOBALS['output_path'];
+	$url=$GLOBALS['url'];
 	$curlpost=$GLOBALS['curlpost'];
 	//一般頁面
 	echo htmlhead();
@@ -477,7 +499,6 @@ function phppoi(){
 	$output.='<a href="'.$output_path.'">'.$output_path.'</a>'."\n";
 	$output.='<a href="./'.$phpself.'">返</a>'."\n";
 	$output.='<a href="./">根</a>'."\n";
-	
 	//$output.='<pre>'.$curlpost.'</pre>'."\n";
 
 	//$output.='<a href="https://archive.today/?run=1&url='.$phplink.'" target="_blank">archive.today</a>'."\n";
