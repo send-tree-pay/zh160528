@@ -197,6 +197,7 @@ if($kdao_only){//只使用於綜合網址
 			foreach($vv->find('a') as $k2 => $v2){
 				foreach($v2->find('img') as $k3 => $v3){
 					$chat_array[$k]['image']  =$v3->parent->href;//
+					$chat_array[$k]['image_t'] =$v3->src;
 				}
 				$v2->outertext="";
 			}
@@ -208,7 +209,7 @@ if($kdao_only){//只使用於綜合網址
 			$chat_array[$k]['zzz_text']=$vv->outertext;
 			//
 			//$chat_array[$k]['time']=strip_tags($chat_array[$k]['zzz_text']);
-			preg_match("/[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+/",$chat_array[$k]['zzz_text'],$chat_array[$k]['time']);
+			preg_match("/[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+ /U",$chat_array[$k]['zzz_text'],$chat_array[$k]['time']);
 			$chat_array[$k]['time'] = implode("",$chat_array[$k]['time']);
 			//整理過的清掉
 			$vv->outertext='';
@@ -256,14 +257,14 @@ if($kdao_only){//只使用於綜合網址
 	foreach($html->find('a') as $k2 => $v2){
 		foreach($v2->find('img') as $k3 => $v3){
 			$chat_array[0]['image']  =$v3->parent->href;//
+			$chat_array[0]['image_t'] =$v3->src;
 		}
 		$v2->outertext="";
 	}
 	//
 	$chat_array[0]['zzz_text'] = $html->outertext;//剩餘的內容//非檢查點//下方有用到
 	//
-	//preg_match("/\[[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+ /U",$chat_array[0]['zzz_text'],$chat_array[0]['time']);
-	preg_match("/[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+/",$chat_array[0]['zzz_text'],$chat_array[0]['time']);
+	preg_match("/[0-9]{2}\/[0-9]{2}\/[0-9]{2}.*ID.*No\.[0-9]+ /U",$chat_array[0]['zzz_text'],$chat_array[0]['time']);
 	$chat_array[0]['time'] = implode("",$chat_array[0]['time']);
 	//
 	ksort($chat_array);//排序
@@ -285,34 +286,63 @@ if($kdao_only){//只使用於綜合網址
 		$htmlbody.= '<span class="name">'.$v['name'].'</span>'."\n";
 		$htmlbody.= '<span class="title">'.$v['title'].'</span>'."\n";
 		//名稱 ID時間
-		$v['time']=preg_replace('/\]/', '', $v['time']);
 		$v['time']=strip_tags($v['time']);
 		$htmlbody.= '<span class="idno">'.$v['time'].'</span>'."\n";
 		//內文
 		$v['text']=strip_tags($v['text'],"<br><font>");//留下換行標籤
 		$htmlbody.= '<span class="text"><blockquote>'.$v['text'].'</blockquote></span>'."\n";
 		if( $v['image'] ){//回應中有圖 // 網址字串
+			$cc2++;//計算圖片數量
+			//
 			//$htmlbody.= '[<span class="image"><a href="'.$v['image'].'" target="_blank"><img class="zoom" src="'.$v['image'].'"/></a></span>]'."<br/>\n";
 			//$tmp='http://zh150609.xp3.biz/mysql_blob.php?cdn!'.$v['image'];
-			$tmp0="http://web.archive.org/web/2016/".$v['image'];
+			//$tmp0="http://web.archive.org/web/2016/".$v['image'];
 			//$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp.'"/></span>]';
 			//$tmp="http://demo.cloudimg.io/cdn/n/n/".$v['image'];
 
-			$tmp="http://demo.cloudimg.io/cdn/n/n/".$tmp0;
+			//$tmp="http://demo.cloudimg.io/cdn/n/n/"."http://web.archive.org/web/2016/".$v['image'];
 			//$htmlbody.= '[<span class="image2"><a href="'.$tmp.'"/>備份?</a></span>]';
-			$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp.'"/></span>]';
+			//$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp.'"/></span>]';
 			//$tmp='http://crossorigin.me/http://zh150614.athost.biz/img_hot_url.php?door='.$tmp;
 			//$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp.'"/></span>]';
 
 
-			$tmp="".$tmp0;
-			$htmlbody.= '[<span class="image2"><a href="'.$tmp.'"/>備份?</a></span>]';
+			if(1==1){
+				$tmp_w="http://web.archive.org/web/2016/";
+				//
+				if(1==1){
+					$tmp=$tmp_w;
+					$tmp_a="http://demo.cloudimg.io/cdn/n/n/".$tmp;
+				}else{
+					$FFF_arr=explode("//",$tmp_w);
+					$tmp=$FFF_arr[1];
+					//$tmp=.$v['image'];
+					$FFF=$cc2%3;
+					$tmp_a='https://i'.$FFF.'.wp.com/'.$tmp;
+				}
+				//
+				$tmp_r=$tmp_a.$v['image'];//原圖
+				$tmp_t=$tmp_a.$v['image_t'];//縮圖
+				$tmp_w2=$tmp_w.$v['image'];
+				if( preg_match('/\.webm$/',$v['image'])){
+					//$tmp="".$tmp0;
+					$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp_t.'"/></span>]';//縮圖
+					$htmlbody.='<b>webm內容</b>';
+					//$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp_r.'"/></span>]';//讀取
+					$htmlbody.= '[<span class="image"><video controls preload="metadata">您<source src="'.$tmp_w2.'" type="video/webm"></video></span>]';
+				}else{
+					//$tmp="http://demo.cloudimg.io/cdn/n/n/".$tmp0;
+					$htmlbody.= '[<span class="image"><img class="zoom" src="'.$tmp_r.'"/></span>]';
+				}
+				//$tmp="".$tmp0;
+				//$htmlbody.= '[<span class="image2"><a href="'.$tmp.'"/>備份?</a></span>]';
+				//$tmp=preg_replace('/\.webm$/', 's.jpg', $tmp);
+			}
 
 			
 			//$tmp="http://assembly.firesize.com/n/g_none/".$tmp0;
 
 			$htmlbody.= "<br/>\n";
-			$cc2++;//計算圖片數量
 		}
 		$htmlbody.= '</div>'."\n";
 		//
